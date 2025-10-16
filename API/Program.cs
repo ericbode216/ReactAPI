@@ -1,6 +1,9 @@
 
 
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MiniValidation;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +16,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<HouseDbContext>(o =>
     o.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking));
 builder.Services.AddScoped<IHouseRepository, HouseRepository>();
+builder.Services.AddScoped<IBidRepository, BidRepository>();
 
 
 var app = builder.Build();
@@ -29,18 +33,8 @@ app.UseCors(p => p.WithOrigins("http://localhost:3000")
 
 app.UseHttpsRedirection();
 
-
-app.MapGet("/houses", (IHouseRepository repo) => repo.GetAll())
-    .Produces<HouseDto[]>(StatusCodes.Status200OK);
-app.MapGet("/house/{houseId:int}", async (int houseId, IHouseRepository repo) =>
-{
-    var house = await repo.Get(houseId);
-    if (house == null)
-        return Results.Problem($"House with ID {houseId} not found", statusCode: 404);
-    else
-        return Results.Ok(house);
-
-}).ProducesProblem(404).Produces<HouseDetailDto>(StatusCodes.Status200OK);
+app.mapHouseEndpoints();
+app.mapBidEndpoints();
 
 app.Run();
 

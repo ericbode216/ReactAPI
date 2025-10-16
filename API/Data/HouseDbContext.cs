@@ -6,6 +6,7 @@ public class HouseDbContext : DbContext
     public HouseDbContext(DbContextOptions<HouseDbContext> o) :
         base(o){}
     public DbSet<HouseEntity> Houses => Set<HouseEntity>();
+    public DbSet<BidEntity> BidEntities => Set<BidEntity>();
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
